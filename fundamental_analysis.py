@@ -1,18 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jan  2 18:08:11 2024
-
-@author: personal
-"""
-
 import requests
 import matplotlib.pyplot as plt
 
-
 # Function to fetch financial data using Alpha Vantage API
 def get_income_statement(symbol):
-    API_KEY = 'your_api_key'
+    API_KEY = 'Your_api_key'
     url = f'https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={symbol}&apikey={API_KEY}'
     response = requests.get(url)
     if response.status_code == 200:
@@ -21,7 +12,7 @@ def get_income_statement(symbol):
         return None
 
 def get_cashflow_statement(symbol):
-    API_KEY = 'your_api_key'
+    API_KEY = 'Your_api_key'
     url = f'https://www.alphavantage.co/query?function=CASH_FLOW&symbol={symbol}&apikey={API_KEY}'
     response = requests.get(url)
     if response.status_code == 200:
@@ -30,7 +21,7 @@ def get_cashflow_statement(symbol):
         return None
 
 def get_balance_sheet(symbol):
-    API_KEY = 'your_api_key'
+    API_KEY = 'Your_api_key'
     url = f'https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol={symbol}&apikey={API_KEY}'
     response = requests.get(url)
     if response.status_code == 200:
@@ -39,7 +30,7 @@ def get_balance_sheet(symbol):
         return None
 
 def get_earnings(symbol):
-    API_KEY = 'your_api_key'
+    API_KEY = 'Your_api_key'
     url = f'https://www.alphavantage.co/query?function=EARNINGS&symbol={symbol}&apikey={API_KEY}'
     response = requests.get(url)
     if response.status_code == 200:
@@ -173,7 +164,8 @@ def calc_cagr(lst):
     t = len(lst)
     cagr = (lst[len(lst)-1]/lst[0])**(1/t) - 1
     return cagr
-def graph_financials(revenue, gross_profit, net_income, dates):
+
+def graph_financials(revenue, gross_profit, net_income, dates, symbol):
     x = range(len(dates))  # x-axis based on the number of dates
     
     revenue.reverse()
@@ -186,7 +178,7 @@ def graph_financials(revenue, gross_profit, net_income, dates):
     
     plt.xlabel('Ending Fiscal Date')
     plt.ylabel('Amount USD (millions)')
-    plt.title('Financials Over Time')
+    plt.title(f'{symbol} Financials Over Time')
     plt.xticks(x, dates, rotation=45)  # Rotate x-axis labels for readability
     plt.legend()  # Show legend
     
@@ -195,13 +187,14 @@ def graph_financials(revenue, gross_profit, net_income, dates):
 
 if __name__ == '__main__':
     symbol = input("Stock ticker symbol:\n")
+    #symbol2 = input("Stock to compare: ")
     
     yoy_rev = get_revenue(symbol)
     gross_profit = get_gp(symbol)
     net_income = get_net_income(symbol)
     dates = get_dates(symbol)
     
-    graph_financials(yoy_rev, gross_profit, net_income, dates)
+    graph_financials(yoy_rev, gross_profit, net_income, dates, symbol)
     
     rev_cagr = round(calc_cagr(yoy_rev),4)*100
     print(f"The cagr for Revenue over the time frame is {rev_cagr}%")
@@ -209,10 +202,10 @@ if __name__ == '__main__':
     gp_cagr = round(calc_cagr(gross_profit),4)*100
     print(f"The cagr for Gross Profit over the time frame is {gp_cagr}%")
     
-    ni_cagr = round(calc_cagr(net_income),4)*100
+    ni_cagr = (calc_cagr(net_income))*100
     print(f"The cagr for Net Income over the time frame is {ni_cagr}%")
     
-    #Calculate Unlevered Cash flow using : UCF = Net income + D&A - Change in working capital - Capex
+    #Calculate Unlevered Free Cash flow using : UCF = Net income + D&A - Change in working capital - Capex
     d_and_a = get_dep_and_amort(symbol)
     capex = get_capex(symbol)
     cwc = get_change_working_capital(symbol)
@@ -223,7 +216,7 @@ if __name__ == '__main__':
    
     # Plot UCF over time 
     x = range(len(dates))
-    plt.title('Unlevered Cashflow Over Time')
+    plt.title(f'{symbol} Unlevered Cashflow Over Time')
     plt.plot(x, ucf, label = 'Unlevered Cashflow')
     plt.xticks(x, dates, rotation=45)
     plt.xlabel('Ending Fiscal Date')
@@ -238,7 +231,7 @@ if __name__ == '__main__':
     x = range(len(dates))
     eps_in_frame = yearly_eps[0:len(dates)]
     eps_in_frame = eps_in_frame[::-1]
-    plt.title('Reported EPS Over Time')
+    plt.title(f'{symbol} Reported EPS Over Time')
     plt.plot(x, eps_in_frame, label = 'EPS')
     plt.xticks(x, dates, rotation=45)
     plt.xlabel('Ending Fiscal Date')
@@ -247,5 +240,6 @@ if __name__ == '__main__':
     plt.show()
     
     #print(eps_in_frame)
+    
     
     
